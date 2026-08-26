@@ -45,7 +45,7 @@ def get_mask_account(account_number: str) -> str | None:
     return f"**{account_number[-4:]}"
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     while True:
         input_from_user_account = input("Введите свой номер счета:")
         returned_value = get_mask_account(input_from_user_account)

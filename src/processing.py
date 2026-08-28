@@ -18,7 +18,7 @@ def filter_by_state(
     return [item for item in data_list if item.get("state") == state]
 
 
-def sort_by_date(list_data: list[dict], sorted_order: bool = True)->list[dict]:
+def sort_by_date(list_data: list[dict], sorted_order: bool = True) -> list[dict]:
     """Параметры:
         data_list (List[Dict]): Список словарей с данными о транзакциях.
         descending (bool): Порядок сортировки. По умолчанию — True (по убыванию).

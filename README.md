@@ -16,3 +16,16 @@
    
 2. Установите зависимости
    (`pip requirements.txt`)
+
+## Модуль `generators`
+
+Модуль предоставляет генераторы для эффективной обработки транзакций и генерации данных.
+
+### Функции
+
+- `filter_by_currency(transactions, currency)` — возвращает генератор транзакций с заданной валютой.  
+  Пример:
+  ```python
+  usd_transactions = filter_by_currency(transactions, "USD")
+  for _ in range(2):
+      print(next(usd_transactions))

@@ -1,61 +1,65 @@
+import logging
+
+logger = logging.getLogger("masks")
+file_handler = logging.FileHandler("logs/masks.log", mode="w", encoding="utf-8")
+file_formatter = logging.Formatter("%(asctime)s | %(name)s | %(levelname)s | %(message)s")
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
+logger.setLevel(logging.DEBUG)
+
+
 def get_mask_card_number(card_number: str) -> str | None:
     """
     Функция для маскировки номера кредитной карты.
 
-    Функция принимает строку, содержащую номер кредитной карты, и возвращает маскированную версию этого номера.
+    Принимает строку с номером карты, возвращает маскированную версию.
+    Формат: 'XXXX XX** **** XXXX'.
 
-    Параметры:
-    - card_number (str): строка, содержащая номер кредитной карты.
-
-    Возвращает:
-    - str: Маскированная строка с номером карты в формате 'XXXX XX** **** XXXX',
-      или None, если входные данные некорректны.
+    Возвращает None, если входные данные некорректны.
     """
     new_card_number = card_number.replace(" ", "")
+
     if not new_card_number.isdigit():
-        print("Вы ввели неправильный формат номера карты.")
+        logger.error("Некорректный формат номера карты: '%s' (содержит не только цифры)", card_number)
         return None
+
     if len(new_card_number) != 16:
-        print("Номер карты не должен содержать больше 16 цифр.")
+        logger.error(
+            "Некорректная длина номера карты: '%s' (ожидается 16 цифр, получено %d)",
+            card_number,
+            len(new_card_number),
+        )
         return None
-    return new_card_number[:4] + " " + new_card_number[4:6] + "** **** " + new_card_number[-4:]
+
+    masked = new_card_number[:4] + " " + new_card_number[4:6] + "** **** " + new_card_number[-4:]
+    logger.debug("Номер карты %s успешно замаскирован в %s", card_number, masked)
+    return masked
 
 
 def get_mask_account(account_number: str) -> str | None:
     """
-    Функция возвращает замаскированный номер счета, показывающий только последние 4 цифры.
-    Она  принимает номер счета в виде строки, удаляет все пробелы и проверяет,
-    что он состоит из 20 цифр. Если номер счета не соответствует формату, функция
-    выводит сообщение об ошибке и возвращает None. В противном случае возвращает
-    строку, где первые 16 цифр заменены на '**'.
+    Возвращает замаскированный номер счёта, показывающий только последние 4 цифры.
 
-    Параметры:
-    account_number (str): Номер счета в виде строки.
+    Формат: '**...XXXX' (первые 16 заменены на **, остаются последние 4).
 
-    Возвращает:
-    str: Замаскированный номер счета, если формат корректен, иначе None.
+    Возвращает None, если входные данные некорректны.
     """
     new_account_number = account_number.replace(" ", "")
+
     if not new_account_number.isdigit():
-        print("Вы ввели неправильный формат номера счета.")
+        logger.error("Некорректный формат номера счёта: '%s' (содержит не только цифры)", account_number)
         return None
+
     if len(new_account_number) != 20:
-        print("Номер счета не должен содержать больше 20 цифр.")
+        logger.error(
+            "Некорректная длина номера счёта: '%s' (ожидается 20 цифр, получено %d)",
+            account_number,
+            len(new_account_number),
+        )
         return None
-    return f"**{account_number[-4:]}"
 
+    # Исправляем логику маскирования: показываем последние 4, первые 16 заменяем на **
+    masked = "**" + new_account_number[-4:]
 
-if __name__ == "__main__":
-    while True:
-        input_from_user_account = input("Введите свой номер счета:")
-        returned_value = get_mask_account(input_from_user_account)
-        if returned_value:
-            print(returned_value)
-            break
-
-    while True:
-        input_from_user = input("Введите свой номер карты:")
-        returned_value = get_mask_card_number(input_from_user)
-        if returned_value:
-            print(returned_value)
-            break
+    logger.debug("Номер счёта %s успешно замаскирован в %s", account_number, masked)
+    return masked

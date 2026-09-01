@@ -1,61 +1,53 @@
-def get_mask_card_number(card_number: str) -> str | None:
-    """
-    Функция для маскировки номера кредитной карты.
+from typing import Optional
 
-    Функция принимает строку, содержащую номер кредитной карты, и возвращает маскированную версию этого номера.
 
-    Параметры:
-    - card_number (str): строка, содержащая номер кредитной карты.
+def get_mask_card_number(card_number: str) -> Optional[str]:
+    """Маскирует номер кредитной карты.
 
-    Возвращает:
-    - str: Маскированная строка с номером карты в формате 'XXXX XX** **** XXXX',
-      или None, если входные данные некорректны.
+    Принимает строку с номером карты, удаляет пробелы и возвращает
+    маскированную версию в формате 'XXXX XX** **** XXXX'.
+
+    Args:
+        card_number (str): строка с номером кредитной карты.
+
+    Returns:
+        Optional[str]: маскированный номер карты, либо None, если номер
+        некорректен (не 16 цифр или содержит буквы).
     """
     new_card_number = card_number.replace(" ", "")
+
     if not new_card_number.isdigit():
         print("Вы ввели неправильный формат номера карты.")
         return None
+
     if len(new_card_number) != 16:
-        print("Номер карты не должен содержать больше 16 цифр.")
+        print("Номер карты должен содержать 16 цифр.")
         return None
-    return new_card_number[:4] + " " + new_card_number[4:6] + "** **** " + new_card_number[-4:]
+
+    return f"{new_card_number[:4]} {new_card_number[4:6]}** **** {new_card_number[-4:]}"
 
 
-def get_mask_account(account_number: str) -> str | None:
-    """
-    Функция возвращает замаскированный номер счета, показывающий только последние 4 цифры.
-    Она  принимает номер счета в виде строки, удаляет все пробелы и проверяет,
-    что он состоит из 20 цифр. Если номер счета не соответствует формату, функция
-    выводит сообщение об ошибке и возвращает None. В противном случае возвращает
-    строку, где первые 16 цифр заменены на '**'.
+def get_mask_account(account_number: str) -> Optional[str]:
+    """Маскирует номер банковского счёта.
 
-    Параметры:
-    account_number (str): Номер счета в виде строки.
+    Принимает строку с номером счёта, удаляет пробелы и возвращает
+    маскированную версию, где видны только последние 4 цифры.
 
-    Возвращает:
-    str: Замаскированный номер счета, если формат корректен, иначе None.
+    Args:
+        account_number (str): строка с номером счёта.
+
+    Returns:
+        Optional[str]: замаскированный номер счёта в формате '**XXXX',
+        либо None, если номер некорректен (не 20 цифр или содержит буквы).
     """
     new_account_number = account_number.replace(" ", "")
+
     if not new_account_number.isdigit():
-        print("Вы ввели неправильный формат номера счета.")
+        print("Вы ввели неправильный формат номера счёта.")
         return None
+
     if len(new_account_number) != 20:
-        print("Номер счета не должен содержать больше 20 цифр.")
+        print("Номер счёта должен содержать 20 цифр.")
         return None
-    return f"**{account_number[-4:]}"
 
-
-if __name__ == "__main__":
-    while True:
-        input_from_user_account = input("Введите свой номер счета:")
-        returned_value = get_mask_account(input_from_user_account)
-        if returned_value:
-            print(returned_value)
-            break
-
-    while True:
-        input_from_user = input("Введите свой номер карты:")
-        returned_value = get_mask_card_number(input_from_user)
-        if returned_value:
-            print(returned_value)
-            break
+    return f"**{new_account_number[-4:]}"

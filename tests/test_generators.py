@@ -38,11 +38,14 @@ def transactions():
     ]
 
 
-@pytest.mark.parametrize("currency,expected_count", [
-    ("USD", 1),
-    ("RUB", 1),
-    ("EUR", 0),
-])
+@pytest.mark.parametrize(
+    "currency,expected_count",
+    [
+        ("USD", 1),
+        ("RUB", 1),
+        ("EUR", 0),
+    ],
+)
 def test_filter_by_currency(transactions, currency, expected_count):
     result = list(filter_by_currency(transactions, currency))
     assert len(result) == expected_count
@@ -50,23 +53,28 @@ def test_filter_by_currency(transactions, currency, expected_count):
         assert result[0]["operationAmount"]["currency"]["code"] == currency
 
 
-@pytest.mark.parametrize("input_list,expected_descriptions", [
-    ([], []),
-    ([{"description": "A"}], ["A"]),
-    ([{"description": "A"}, {"description": "B"}], ["A", "B"]),
-    ([{"description": "X"}, {}], ["X", ""]),
-])
+@pytest.mark.parametrize(
+    "input_list,expected_descriptions",
+    [
+        ([], []),
+        ([{"description": "A"}], ["A"]),
+        ([{"description": "A"}, {"description": "B"}], ["A", "B"]),
+        ([{"description": "X"}, {}], ["X", ""]),
+    ],
+)
 def test_transaction_descriptions(input_list, expected_descriptions):
     result = list(transaction_descriptions(input_list))
     assert result == expected_descriptions
 
 
-@pytest.mark.parametrize("start,stop,expected", [
-    (1, 1, ["0000 0000 0000 0001"]),
-    (1, 3, ["0000 0000 0000 0001", "0000 0000 0000 0002", "0000 0000 0000 0003"]),
-    (9999999999999998, 9999999999999999,
-     ["9999 9999 9999 9998", "9999 9999 9999 9999"]),
-])
+@pytest.mark.parametrize(
+    "start,stop,expected",
+    [
+        (1, 1, ["0000 0000 0000 0001"]),
+        (1, 3, ["0000 0000 0000 0001", "0000 0000 0000 0002", "0000 0000 0000 0003"]),
+        (9999999999999998, 9999999999999999, ["9999 9999 9999 9998", "9999 9999 9999 9999"]),
+    ],
+)
 def test_card_number_generator(start, stop, expected):
     result = list(card_number_generator(start, stop))
     assert result == expected

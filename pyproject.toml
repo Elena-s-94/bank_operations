@@ -7,9 +7,11 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "pandas (>=3.0.5,<4.0.0)",
+    "openpyxl (>=3.1.5,<4.0.0)"
 ]
 
-packages = [{ include = "generators", from = "src" }]
+packages = [{ include = "*", from = "src" }]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -54,3 +56,4 @@ line_length = 119
 
 [tool.poetry]
 package-mode = false
+

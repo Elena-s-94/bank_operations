@@ -25,8 +25,10 @@ def mask_account_card(info: str) -> str:
 
 
 def get_date(date_str: str) -> str:
-    """Принимает строку с датой и возвращает  корректный
+    """Принимает строку с датой и возвращает корректный
     результат в формате "11.03.2024"."""
+    if not date_str or len(date_str) < 10:
+        return ""
 
     year = date_str[0:4]
     month = date_str[5:7]

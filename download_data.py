@@ -8,12 +8,12 @@ os.makedirs(data_dir, exist_ok=True)
 files = [
     {
         "url": "https://raw.githubusercontent.com/skypro-008/transactions/main/transactions.csv",
-        "filename": "transactions.csv"
+        "filename": "transactions.csv",
     },
     {
         "url": "https://github.com/skypro-008/transactions/raw/main/transactions_excel.xlsx",
-        "filename": "transactions_excel.xlsx"
-    }
+        "filename": "transactions_excel.xlsx",
+    },
 ]
 
 for item in files:

@@ -29,3 +29,14 @@
   usd_transactions = filter_by_currency(transactions, "USD")
   for _ in range(2):
       print(next(usd_transactions))
+  
+## Модуль `utils`
+
+Функция `read_json_file` читает JSON-файл с транзакциями и возвращает список словарей.
+При ошибке (файл не найден, пустой, не список) возвращает пустой список.
+
+## Модуль `external_api`
+
+Функция `convert_to_rub` конвертирует сумму транзакции в рубли.
+Для USD и EUR используется Exchange Rates Data API (apilayer.com).
+API-ключ хранится в файле `.env` (см. `.env.template`).

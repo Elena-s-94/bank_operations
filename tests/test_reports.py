@@ -7,13 +7,14 @@ from src.reports import save_report, spending_by_category, spending_by_weekday, 
 
 def test_spending_by_category_basic():
     df = pd.DataFrame({
-        "Дата операции": ["2024-01-01", "2024-02-01", "2024-03-01"],
+        "Дата операции": ["2024-01-10", "2024-02-01", "2024-03-01"],
         "Категория": ["Продукты", "Продукты", "Транспорт"],
         "Сумма операции": [-100, -200, -300],
     })
-    res = spending_by_category(df, "Продукты")
+    res = spending_by_category(df, "Продукты", date="2024-04-01")
     assert len(res) == 2
     assert set(res["Категория"]) == {"Продукты"}
+
 
 def test_spending_by_category_empty():
     df = pd.DataFrame({
@@ -24,34 +25,30 @@ def test_spending_by_category_empty():
     res = spending_by_category(df, "Продукты")
     assert res.empty
 
+
 def test_spending_by_weekday_basic():
-    dates = [
-        datetime(2024, 1, 1),  # понедельник
-        datetime(2024, 1, 6),  # суббота
-        datetime(2024, 1, 7),  # воскресенье
-    ]
+    # Используем строки дат, чтобы pd.to_datetime и логика внутри функции работали одинаково
+    dates = ["2024-01-01", "2024-01-06", "2024-01-07"]
     df = pd.DataFrame({
         "Дата операции": dates,
         "Сумма операции": [-100, -200, -300],
     })
-    res = spending_by_weekday(df)
+    res = spending_by_weekday(df, date="2024-01-31")
     assert not res.empty
     assert "День недели" in res.columns
     assert "Средние траты" in res.columns
 
+
 def test_spending_by_workday_basic():
-    dates = [
-        datetime(2024, 1, 1),
-        datetime(2024, 1, 6),
-        datetime(2024, 1, 7),
-    ]
+    dates = ["2024-01-01", "2024-01-06", "2024-01-07"]
     df = pd.DataFrame({
         "Дата операции": dates,
         "Сумма операции": [-100, -200, -300],
     })
-    res = spending_by_workday(df)
+    res = spending_by_workday(df, date="2024-01-31")
     assert not res.empty
     assert set(res["Тип дня"]) <= {"Рабочий", "Выходной"}
+
 
 @patch("os.makedirs")
 def test_save_report_decorator_dataframe(makedirs_mock):
@@ -65,6 +62,7 @@ def test_save_report_decorator_dataframe(makedirs_mock):
         data = json.load(f)
     assert isinstance(data, list)
     os.remove("test_report.json")
+
 
 @patch("os.makedirs")
 def test_save_report_decorator_dict(makedirs_mock):

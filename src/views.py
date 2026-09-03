@@ -56,7 +56,7 @@ def get_cards_info(transactions: pd.DataFrame) -> List[Dict[str, Any]]:
     for card_number, group in transactions.groupby("Номер карты", dropna=False):
         if pd.isna(card_number) or not str(card_number).strip():
             continue
-        last_digits = str(int(card_number))[-4:] if card_number else ""
+        last_digits = str(card_number)[-4:] if card_number else ""
         # Сумма расходов — только отрицательные операции (траты)
         spent = group.loc[group["Сумма операции"] < 0, "Сумма операции"].sum()
         total_spent = abs(round(float(spent), 2))

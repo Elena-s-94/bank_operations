@@ -2,7 +2,6 @@
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
@@ -25,6 +24,9 @@ def read_excel_file(filepath: str) -> pd.DataFrame:
 
     try:
         df = pd.read_excel(path, engine="openpyxl")
+        # Сюда вставляем преобразование даты:
+        df["Дата операции"] = pd.to_datetime(df["Дата операции"], dayfirst=True, errors="coerce")
+
         logger.info("Excel-файл успешно прочитан: %s (строк: %d)", filepath, len(df))
         return df
     except Exception as e:

@@ -13,16 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_greeting(current_time: Optional[str] = None) -> str:
-    """Возвращает приветствие в зависимости от времени суток.
-
-    Args:
-        current_time (Optional[str]): время в формате 'HH:MM:SS'.
-            Если None — берётся текущее время.
-
-    Returns:
-        str: приветствие — 'Доброе утро', 'Добрый день',
-        'Добрый вечер' или 'Доброй ночи'.
-    """
+    """Возвращает приветствие в зависимости от времени суток."""
     if current_time:
         hour = int(current_time.split(":")[0])
     else:
@@ -39,25 +30,17 @@ def get_greeting(current_time: Optional[str] = None) -> str:
 
 
 def get_cards_info(transactions: pd.DataFrame) -> List[Dict[str, Any]]:
-    """Возвращает информацию по каждой карте.
+    """Возвращает информацию по каждой карте."""
+    # Явная аннотация типа для локальной переменной
+    cards: List[Dict[str, Any]] = []
 
-    Args:
-        transactions (pd.DataFrame): датафрейм с транзакциями.
-
-    Returns:
-        List[Dict[str, Any]]: список словарей с ключами
-        'last_digits', 'total_spent', 'cashback'.
-    """
-    cards = []
     if transactions.empty:
         return cards
 
-    # Группируем по номеру карты
     for card_number, group in transactions.groupby("Номер карты", dropna=False):
         if pd.isna(card_number) or not str(card_number).strip():
             continue
         last_digits = str(card_number)[-4:] if card_number else ""
-        # Сумма расходов — только отрицательные операции (траты)
         spent = group.loc[group["Сумма операции"] < 0, "Сумма операции"].sum()
         total_spent = abs(round(float(spent), 2))
         cashback = round(total_spent / 100, 2)
@@ -72,17 +55,9 @@ def get_cards_info(transactions: pd.DataFrame) -> List[Dict[str, Any]]:
 
 
 def get_top_transactions(transactions: pd.DataFrame, n: int = 5) -> List[Dict[str, Any]]:
-    """Возвращает топ-N транзакций по сумме платежа.
+    """Возвращает топ-N транзакций по сумме платежа."""
+    result: List[Dict[str, Any]] = []
 
-    Args:
-        transactions (pd.DataFrame): датафрейм с транзакциями.
-        n (int): количество транзакций в топе. По умолчанию 5.
-
-    Returns:
-        List[Dict[str, Any]]: список словарей с ключами
-        'date', 'amount', 'category', 'description'.
-    """
-    result = []
     if transactions.empty:
         return result
 
@@ -115,18 +90,15 @@ def get_top_transactions(transactions: pd.DataFrame, n: int = 5) -> List[Dict[st
 
 
 def load_user_settings(filepath: str = "user_settings.json") -> Dict[str, List[str]]:
-    """Загружает пользовательские настройки из JSON-файла.
-
-    Args:
-        filepath (str): путь к файлу настроек.
-
-    Returns:
-        Dict[str, List[str]]: словарь с ключами
-        'user_currencies' и 'user_stocks'.
-    """
+    """Загружает пользовательские настройки из JSON-файла."""
     try:
         with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            # Гарантируем правильный тип возврата
+            return {
+                "user_currencies": data.get("user_currencies", []),
+                "user_stocks": data.get("user_stocks", []),
+            }
     except (FileNotFoundError, json.JSONDecodeError) as e:
         logger.error("Ошибка загрузки настроек: %s", e)
         return {"user_currencies": [], "user_stocks": []}
@@ -137,45 +109,31 @@ def main(
     transactions: pd.DataFrame,
     user_settings_path: str = "user_settings.json",
 ) -> Dict[str, Any]:
-    """Главная функция для страницы «Главная».
-
-    Принимает дату и время, возвращает JSON-ответ с приветствием,
-    информацией по картам, топ-5 транзакций, курсами валют и ценами акций.
-
-    Args:
-        date_str (str): дата и время в формате 'YYYY-MM-DD HH:MM:SS'.
-        transactions (pd.DataFrame): датафрейм с транзакциями.
-        user_settings_path (str): путь к файлу пользовательских настроек.
-
-    Returns:
-        Dict[str, Any]: JSON-ответ для веб-страницы.
-    """
-    # Парсим входную дату
+    """Главная функция для страницы «Главная»."""
     try:
         input_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
     except ValueError:
         logger.error("Неверный формат даты: %s", date_str)
         input_date = datetime.now()
 
-    # Фильтруем транзакции: с начала месяца по входящую дату
     month_start = input_date.replace(day=1, hour=0, minute=0, second=0)
+
+    # Аннотации для локальных переменных
+    filtered: pd.DataFrame = transactions
     if not transactions.empty:
         df = transactions.copy()
         df["Дата операции"] = pd.to_datetime(df["Дата операции"], errors="coerce")
         mask = (df["Дата операции"] >= month_start) & (df["Дата операции"] <= input_date)
         filtered = df[mask]
-    else:
-        filtered = transactions
 
-    # Загружаем настройки
-    settings = load_user_settings(user_settings_path)
+    settings: Dict[str, List[str]] = load_user_settings(user_settings_path)
+    time_part = date_str.split(" ")[1] if " " in date_str else None
+    greeting: str = get_greeting(time_part)
 
-    # Собираем ответ
-    greeting = get_greeting(date_str.split(" ")[1] if " " in date_str else None)
-    cards = get_cards_info(filtered)
-    top_transactions = get_top_transactions(filtered, 5)
-    currency_rates = get_currency_rates(settings.get("user_currencies", []))
-    stock_prices = get_stock_prices(settings.get("user_stocks", []))
+    cards: List[Dict[str, Any]] = get_cards_info(filtered)
+    top_transactions: List[Dict[str, Any]] = get_top_transactions(filtered, 5)
+    currency_rates: Any = get_currency_rates(settings.get("user_currencies", []))
+    stock_prices: Any = get_stock_prices(settings.get("user_stocks", []))
 
     return {
         "greeting": greeting,
@@ -190,25 +148,15 @@ def events(
     date_str: str,
     transactions: pd.DataFrame,
     period: str = "M",
-    user_settings_path: str = "user_settings.json",
+    user_settings_path: str = "user_settings.path",
 ) -> Dict[str, Any]:
-    """Функция для страницы «События».
-
-    Args:
-        date_str (str): дата в формате 'YYYY-MM-DD HH:MM:SS'.
-        transactions (pd.DataFrame): датафрейм с транзакциями.
-        period (str): диапазон данных — 'W', 'M', 'Y', 'ALL'.
-        user_settings_path (str): путь к файлу настроек.
-
-    Returns:
-        Dict[str, Any]: JSON-ответ с расходами, поступлениями,
-        курсами валют и ценами акций.
-    """
+    """Функция для страницы «События»."""
     try:
         input_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
     except ValueError:
         input_date = datetime.now()
 
+    filtered: pd.DataFrame = transactions
     if not transactions.empty:
         df = transactions.copy()
         df["Дата операции"] = pd.to_datetime(df["Дата операции"], errors="coerce")
@@ -224,15 +172,13 @@ def events(
 
         mask = (df["Дата операции"] >= start) & (df["Дата операции"] <= input_date)
         filtered = df[mask]
-    else:
-        filtered = transactions
 
-    expenses = _get_expenses(filtered)
-    income = _get_income(filtered)
+    expenses: Dict[str, Any] = _get_expenses(filtered)
+    income: Dict[str, Any] = _get_income(filtered)
 
-    settings = load_user_settings(user_settings_path)
-    currency_rates = get_currency_rates(settings.get("user_currencies", []))
-    stock_prices = get_stock_prices(settings.get("user_stocks", []))
+    settings: Dict[str, List[str]] = load_user_settings(user_settings_path)
+    currency_rates: Any = get_currency_rates(settings.get("user_currencies", []))
+    stock_prices: Any = get_stock_prices(settings.get("user_stocks", []))
 
     return {
         "expenses": expenses,
@@ -243,14 +189,7 @@ def events(
 
 
 def _get_expenses(transactions: pd.DataFrame) -> Dict[str, Any]:
-    """Формирует блок расходов: основные категории и переводы/наличные.
-
-    Args:
-        transactions (pd.DataFrame): отфильтрованный датафрейм.
-
-    Returns:
-        Dict[str, Any]: словарь с 'total_amount', 'main', 'transfers_and_cash'.
-    """
+    """Формирует блок расходов: основные категории и переводы/наличные."""
     if transactions.empty:
         return {"total_amount": 0, "main": [], "transfers_and_cash": []}
 
@@ -259,26 +198,26 @@ def _get_expenses(transactions: pd.DataFrame) -> Dict[str, Any]:
     expenses_df = expenses_df.copy()
     expenses_df["abs_amount"] = expenses_df["Сумма операции"].abs()
 
-    total = int(round(expenses_df["abs_amount"].sum()))
+    total: int = int(round(expenses_df["abs_amount"].sum()))
 
-    # Разделяем на основные и переводы/наличные
     transfer_categories = ["Наличные", "Переводы"]
     main_df = expenses_df[~expenses_df["Категория"].isin(transfer_categories)]
     transfer_df = expenses_df[expenses_df["Категория"].isin(transfer_categories)]
 
-    # Топ-7 категорий + "Остальное"
     by_category = main_df.groupby("Категория")["abs_amount"].sum().sort_values(ascending=False)
     top7 = by_category.head(7).round().astype(int).to_dict()
     rest = int(round(by_category.iloc[7:].sum())) if len(by_category) > 7 else 0
 
-    main_list = [{"category": cat, "amount": amt} for cat, amt in top7.items()]
+    main_list: List[Dict[str, Any]] = [{"category": str(cat), "amount": int(amt)} for cat, amt in top7.items()]
     if rest > 0:
         main_list.append({"category": "Остальное", "amount": rest})
 
     transfers_list = (
         transfer_df.groupby("Категория")["abs_amount"].sum().sort_values(ascending=False).round().astype(int).to_dict()
     )
-    transfers_and_cash = [{"category": cat, "amount": amt} for cat, amt in transfers_list.items()]
+    transfers_and_cash: List[Dict[str, Any]] = [
+        {"category": str(cat), "amount": int(amt)} for cat, amt in transfers_list.items()
+    ]
 
     return {
         "total_amount": total,
@@ -288,23 +227,19 @@ def _get_expenses(transactions: pd.DataFrame) -> Dict[str, Any]:
 
 
 def _get_income(transactions: pd.DataFrame) -> Dict[str, Any]:
-    """Формирует блок поступлений.
-
-    Args:
-        transactions (pd.DataFrame): отфильтрованный датафрейм.
-
-    Returns:
-        Dict[str, Any]: словарь с 'total_amount' и 'main'.
-    """
+    """Формирует блок поступлений."""
     if transactions.empty:
         return {"total_amount": 0, "main": []}
 
     df = transactions.copy()
     income_df = df[df["Сумма операции"] > 0]
 
-    total = int(round(income_df["Сумма операции"].sum()))
+    total: int = int(round(income_df["Сумма операции"].sum()))
 
     by_category = income_df.groupby("Категория")["Сумма операции"].sum().sort_values(ascending=False)
-    main_list = [{"category": cat, "amount": int(round(amt))} for cat, amt in by_category.items()]
+
+    main_list: List[Dict[str, Any]] = [
+        {"category": str(cat), "amount": int(round(amt))} for cat, amt in by_category.items()
+    ]
 
     return {"total_amount": total, "main": main_list}

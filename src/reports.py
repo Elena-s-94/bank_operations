@@ -25,7 +25,7 @@ def save_report(filepath: Optional[str] = None) -> Callable:
 
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs) -> Any:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             result = func(*args, **kwargs)
             save_path = filepath or os.path.join("reports", "report.json")
             os.makedirs(os.path.dirname(save_path), exist_ok=True)

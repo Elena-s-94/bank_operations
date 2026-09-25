@@ -1,4 +1,4 @@
-from main import Product
+from main import Product, Smartphone, LawnGrass
 
 
 def test_product_initialization():
@@ -83,16 +83,76 @@ def test_product_add():
     assert a + b == 1400.0
 
 
-def test_product_add_same_prices():
-    a = Product("Товар A", "Описание A", 50.0, 5)
-    b = Product("Товар B", "Описание B", 50.0, 5)
+def test_product_add_same_class():
+    a = Product("A", "Desc", 50.0, 5)
+    b = Product("B", "Desc", 50.0, 5)
     assert a + b == 500.0
 
 
-def test_product_add_type_error():
-    a = Product("Товар A", "Описание A", 100.0, 10)
+def test_product_add_different_class_type_error():
+    s = Smartphone("iPhone", "Apple", 1000.0, 10, "A16", "15", 128, "чёрный")
+    g = LawnGrass("Трава", "Газон", 500.0, 20, "Россия", "7 дней", "зелёный")
     try:
-        a + 100
+        s + g
+        assert False, "Должно было сработать исключение TypeError"
+    except TypeError:
+        pass
+
+
+def test_smartphone_initialization():
+    s = Smartphone("iPhone 15", "Apple", 99999.99, 10,
+                   "A16 Bionic", "iPhone 15", 128, "чёрный")
+    assert s.name == "iPhone 15"
+    assert s.description == "Apple"
+    assert s.price == 99999.99
+    assert s.quantity == 10
+    assert s.efficiency == "A16 Bionic"
+    assert s.model == "iPhone 15"
+    assert s.memory == 128
+    assert s.color == "чёрный"
+
+
+def test_smartphone_is_product():
+    s = Smartphone("iPhone 15", "Apple", 99999.99, 10,
+                   "A16 Bionic", "iPhone 15", 128, "чёрный")
+    assert isinstance(s, Product)
+
+
+def test_smartphone_add():
+    a = Smartphone("iPhone", "Apple", 1000.0, 10, "A16", "15", 128, "чёрный")
+    b = Smartphone("Samsung", "Android", 800.0, 5, "SD8", "S24", 256, "белый")
+    assert a + b == 14000.0
+
+
+def test_lawngrass_initialization():
+    g = LawnGrass("Трава", "Газон", 500.0, 20,
+                  "Россия", "7 дней", "зелёный")
+    assert g.name == "Трава"
+    assert g.description == "Газон"
+    assert g.price == 500.0
+    assert g.quantity == 20
+    assert g.country == "Россия"
+    assert g.germination_period == "7 дней"
+    assert g.color == "зелёный"
+
+
+def test_lawngrass_is_product():
+    g = LawnGrass("Трава", "Газон", 500.0, 20,
+                  "Россия", "7 дней", "зелёный")
+    assert isinstance(g, Product)
+
+
+def test_lawngrass_add():
+    a = LawnGrass("Трава1", "Газон", 500.0, 20, "Россия", "7 дней", "зелёный")
+    b = LawnGrass("Трава2", "Газон", 700.0, 15, "Нидерланды", "5 дней", "тёмно-зелёный")
+    assert a + b == 20500.0
+
+
+def test_product_add_with_base_class_type_error():
+    p = Product("Base", "Desc", 100.0, 10)
+    s = Smartphone("iPhone", "Apple", 1000.0, 10, "A16", "15", 128, "чёрный")
+    try:
+        p + s
         assert False, "Должно было сработать исключение TypeError"
     except TypeError:
         pass

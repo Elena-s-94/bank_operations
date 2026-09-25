@@ -1,4 +1,4 @@
-from main import Category, Product
+from main import Category, Product, Smartphone, LawnGrass
 
 
 def test_category_initialization():
@@ -55,6 +55,48 @@ def test_add_product():
     assert Category.product_count == initial_prod_count + 1
     assert "Keyboard" in c.products
     assert "1500" in c.products
+
+
+def test_add_product_smartphone():
+    c = Category("Phones", "Smartphones", products=[])
+    s = Smartphone("iPhone 15", "Apple", 99999.99, 10,
+                   "A16 Bionic", "iPhone 15", 128, "чёрный")
+    initial_prod_count = Category.product_count
+
+    c.add_product(s)
+
+    assert Category.product_count == initial_prod_count + 1
+    assert "iPhone 15" in c.products
+
+
+def test_add_product_lawngrass():
+    c = Category("Garden", "Grass", products=[])
+    g = LawnGrass("Трава", "Газон", 500.0, 20,
+                  "Россия", "7 дней", "зелёный")
+    initial_prod_count = Category.product_count
+
+    c.add_product(g)
+
+    assert Category.product_count == initial_prod_count + 1
+    assert "Трава" in c.products
+
+
+def test_add_product_invalid_type():
+    c = Category("Test", "Test desc", products=[])
+    try:
+        c.add_product("не товар")
+        assert False, "Должно было сработать исключение TypeError"
+    except TypeError:
+        pass
+
+
+def test_add_product_invalid_type_number():
+    c = Category("Test", "Test desc", products=[])
+    try:
+        c.add_product(123)
+        assert False, "Должно было сработать исключение TypeError"
+    except TypeError:
+        pass
 
 
 def test_add_product_increments_counter():

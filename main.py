@@ -2,7 +2,7 @@ import json
 
 
 class Product:
-    """Класс для описания товара в интернет-магазине."""
+    """Базовый класс для описания товара в интернет-магазине."""
 
     def __init__(self, name: str, description: str, price: float, quantity: int):
         self.name = name
@@ -45,19 +45,75 @@ class Product:
         self.__price = round(new_price, 2)
 
     def __str__(self) -> str:
-        """Строковое представление товара: 'Название, X руб. Остаток: X шт.'"""
+        """Строковое представление товара."""
         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other: "Product") -> float:
-        """Сложение двух товаров: возвращает сумму произведений цены на количество."""
-        if not isinstance(other, Product):
-            raise TypeError("Можно складывать только объекты класса Product")
+        """Сложение двух товаров одного класса: сумма произведений цены на количество."""
+        if type(self) is not type(other):
+            raise TypeError("Можно складывать только товары одного класса")
         return self.__price * self.quantity + other.__price * other.quantity
 
     def __repr__(self) -> str:
         return (
             f"Product(name={self.name!r}, description={self.description!r}, "
             f"price={self.__price}, quantity={self.quantity})"
+        )
+
+
+class Smartphone(Product):
+    """Класс-наследник Product для смартфонов."""
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        efficiency: str,
+        model: str,
+        memory: int,
+        color: str,
+    ):
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+    def __repr__(self) -> str:
+        return (
+            f"Smartphone(name={self.name!r}, description={self.description!r}, "
+            f"price={self.price}, quantity={self.quantity}, "
+            f"efficiency={self.efficiency!r}, model={self.model!r}, "
+            f"memory={self.memory}, color={self.color!r})"
+        )
+
+
+class LawnGrass(Product):
+    """Класс-наследник Product для травы газонной."""
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        country: str,
+        germination_period: str,
+        color: str,
+    ):
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+
+    def __repr__(self) -> str:
+        return (
+            f"LawnGrass(name={self.name!r}, description={self.description!r}, "
+            f"price={self.price}, quantity={self.quantity}, "
+            f"country={self.country!r}, germination_period={self.germination_period!r}, "
+            f"color={self.color!r})"
         )
 
 
@@ -68,10 +124,10 @@ class Category:
     product_count: int = 0
 
     def __init__(
-            self,
-            name: str,
-            description: str,
-            products: list[Product] | None = None,
+        self,
+        name: str,
+        description: str,
+        products: list[Product] | None = None,
     ):
         self.name = name
         self.description = description
@@ -81,7 +137,10 @@ class Category:
         Category.product_count += len(self.__products)
 
     def add_product(self, product: Product) -> None:
-        """Добавляет продукт в приватный список товаров категории."""
+        """Добавляет продукт в приватный список товаров категории.
+        Принимает только объекты класса Product или его наследников."""
+        if not isinstance(product, Product):
+            raise TypeError("Можно добавлять только объекты класса Product или его наследников")
         self.__products.append(product)
         Category.product_count += 1
 
@@ -94,10 +153,7 @@ class Category:
         return result
 
     def __str__(self) -> str:
-        """Строковое представление категории: 'Название категории, количество продуктов: X шт.'
-
-        Количество — это сумма quantity всех товаров в категории.
-        """
+        """Строковое представление категории с общим количеством товаров на складе."""
         total_quantity = sum(p.quantity for p in self.__products)
         return f"{self.name}, количество продуктов: {total_quantity} шт."
 
@@ -134,18 +190,30 @@ def load_categories_from_json(path: str) -> list[Category]:
 
 
 if __name__ == "__main__":
-    p1 = Product("Laptop", "Good laptop", 999.99, 10)
-    p2 = Product("Mouse", "Wireless mouse", 29.90, 50)
-    c = Category("Electronics", "All electronics", [p1, p2])
+    s1 = Smartphone("iPhone 15", "Apple smartphone", 99999.99, 10,
+                    "A16 Bionic", "iPhone 15", 128, "чёрный")
+    s2 = Smartphone("Samsung Galaxy", "Android smartphone", 79999.99, 5,
+                    "Snapdragon 8", "Galaxy S24", 256, "белый")
+    print(s1)
+    print(f"Сумма смартфонов: {s1 + s2}")
+
+    g1 = LawnGrass("Газонная трава №1", "Для дачи", 500.0, 20,
+                   "Россия", "7 дней", "зелёный")
+    g2 = LawnGrass("Газонная трава №2", "Для стадиона", 700.0, 15,
+                   "Нидерланды", "5 дней", "тёмно-зелёный")
+    print(g1)
+    print(f"Сумма трав: {g1 + g2}")
+
+    try:
+        print(s1 + g1)
+    except TypeError as e:
+        print(f"Ошибка: {e}")
+
+    c = Category("Электроника", "Смартфоны и гаджеты", [s1, s2])
     print(c)
     print(c.products)
 
-    p3 = Product.new_product(
-        {"name": "Keyboard", "description": "Mechanical", "price": 1500.0, "quantity": 20}
-    )
-    c.add_product(p3)
-    print(c.products)
-    print(f"Категорий: {Category.category_count}, Товаров: {Category.product_count}")
-
-    print(f"Сложение товаров: {p1 + p2}")
-    print(f"Сумма Laptop и Keyboard: {p1 + p3}")
+    try:
+        c.add_product("не товар")
+    except TypeError as e:
+        print(f"Ошибка: {e}")

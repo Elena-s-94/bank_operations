@@ -100,3 +100,33 @@ def test_category_str_multiple_quantities():
     c = Category("Test", "Desc", products=[p1, p2, p3])
     result = str(c)
     assert "10" in result
+
+
+def test_category_total_cost():
+    p1 = Product("Laptop", "Good laptop", 999.99, 10)
+    p2 = Product("Mouse", "Wireless mouse", 29.90, 50)
+    c = Category("Electronics", "All electronics", [p1, p2])
+    assert c.total_cost == 999.99 * 10 + 29.90 * 50
+
+
+def test_category_total_cost_empty():
+    c = Category("Empty", "No products", None)
+    assert c.total_cost == 0
+
+
+def test_category_total_cost_after_add():
+    c = Category("Test", "Desc", products=[])
+    p = Product("Item", "Desc", 100.0, 5)
+    c.add_product(p)
+    assert c.total_cost == 500.0
+
+
+def test_load_categories_from_json():
+    from main import load_categories_from_json
+    import os
+
+    json_path = os.path.join(os.path.dirname(__file__), "..", "products.json")
+    if os.path.exists(json_path):
+        categories = load_categories_from_json(json_path)
+        assert len(categories) > 0
+        assert isinstance(categories[0], Category)

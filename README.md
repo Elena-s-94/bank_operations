@@ -1,31 +1,27 @@
-  # Bank Operations Widget
+# Bank Operations Widget
 
 Виджет для обработки банковских операций: фильтрация по статусу и сортировка по дате.
 
 ## Возможности
 
-- `filter_by_state`: фильтрация транзакций по состоянию (по умолчанию `"EXECUTED"`).
-- `sort_by_date`: сортировка транзакций по дате (ISO‑формат), с поддержкой отсутствующих дат.
+### Банковские операции
+- `filter_by_state`: фильтрация транзакций по состоянию (по умолчанию "EXECUTED").
+- `sort_by_date`: сортировка транзакций по дате (ISO-формате), с поддержкой отсутствующих дат.
+
+### Электронная коммерция
+- `BaseProduct` — абстрактный базовый класс для всех продуктов.
+- `Product` — класс товара с ценой (округление до 2 знаков), количеством, свойством `price` и сложением через `__add__`.
+- `Smartphone` — наследник `Product` с дополнительными атрибутами: производительность, модель, объём памяти, цвет.
+- `LawnGrass` — наследник `Product` с дополнительными атрибутами: страна, период всхожести, цвет.
+- `ProductReprMixin` — миксин, печатающий информацию о создании объекта (класс и параметры).
+- `Category` — категория товаров со счётчиками и геттером `products`.
+- `Order` — заказ товара с расчётом итоговой стоимости.
+- `BaseCategoryOrder` — общий абстрактный класс для `Category` и `Order` со свойством `total_cost`.
+- `load_categories_from_json(path)` — загрузка категорий и товаров из JSON-файла.
 
 ## Установка
 
-1. Клонируй репозиторий:
-   ```bash
-   git clone https://github.com/Elena-s-94/bank_operations_widget.git
-   cd bank_operations_widget
-   
-2. Установите зависимости
-   (`pip requirements.txt`)
-
-## Модуль `generators`
-
-Модуль предоставляет генераторы для эффективной обработки транзакций и генерации данных.
-
-### Функции
-
-- `filter_by_currency(transactions, currency)` — возвращает генератор транзакций с заданной валютой.  
-  Пример:
-  ```python
-  usd_transactions = filter_by_currency(transactions, "USD")
-  for _ in range(2):
-      print(next(usd_transactions))
+Клонируйте репозиторий:
+```bash
+git clone https://github.com/Elena-s-94/bank_operations_widget.git
+cd bank_operations_widget

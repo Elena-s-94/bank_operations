@@ -100,3 +100,84 @@ def test_category_str_multiple_quantities():
     c = Category("Test", "Desc", products=[p1, p2, p3])
     result = str(c)
     assert "10" in result
+
+    def test_average_price():
+        p1 = Product("Laptop", "Good laptop", 999.99, 10)
+        p2 = Product("Mouse", "Wireless mouse", 29.90, 50)
+        c = Category("Electronics", "All electronics", [p1, p2])
+        expected = (999.99 + 29.90) / 2
+        assert c.average_price() == expected
+
+    def test_average_price_empty():
+        c = Category("Empty", "No products", None)
+        assert c.average_price() == 0
+
+    def test_average_price_single_product():
+        p = Product("Item", "Desc", 500.0, 10)
+        c = Category("Single", "One product", [p])
+        assert c.average_price() == 500.0
+
+    def test_average_price_after_add():
+        c = Category("Test", "Desc", products=[])
+        p1 = Product("A", "Desc", 100.0, 5)
+        p2 = Product("B", "Desc", 200.0, 3)
+        c.add_product(p1)
+        c.add_product(p2)
+        assert c.average_price() == 150.0
+
+    def test_add_product_zero_quantity_message(capsys):
+        p = Product("Test", "Desc", 100.0, 5)
+        p.quantity = 0
+        c = Category("Test", "Desc", products=[])
+        c.add_product(p)
+        captured = capsys.readouterr()
+        assert "Товар с нулевым количеством не может быть добавлен" in captured.out
+        assert "Обработка добавления товара завершена" in captured.out
+
+    def test_add_product_success_message(capsys):
+        p = Product("Test", "Desc", 100.0, 5)
+        c = Category("Test", "Desc", products=[])
+        c.add_product(p)
+        captured = capsys.readouterr()
+        assert "Товар успешно добавлен" in captured.out
+        assert "Обработка добавления товара завершена" in captured.out
+
+    def test_add_product_zero_quantity_not_added(capsys):
+        p = Product("Test", "Desc", 100.0, 5)
+        p.quantity = 0
+        c = Category("Test", "Desc", products=[])
+        initial_count = Category.product_count
+        c.add_product(p)
+        assert Category.product_count == initial_count
+        assert c.products == ""
+
+
+def test_load_categories_from_json(tmp_path):
+    import json
+    from main import load_categories_from_json
+
+    data = [
+        {
+            "name": "Electronics",
+            "description": "Electronic goods",
+            "products": [
+                {"name": "Laptop", "description": "Good laptop", "price": 999.99, "quantity": 10},
+                {"name": "Mouse", "description": "Wireless", "price": 29.90, "quantity": 50},
+            ],
+        },
+        {
+            "name": "Books",
+            "description": "All books",
+            "products": [],
+        },
+    ]
+    json_file = tmp_path / "products.json"
+    json_file.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+
+    categories = load_categories_from_json(str(json_file))
+    assert len(categories) == 2
+    assert categories[0].name == "Electronics"
+    assert categories[1].name == "Books"
+    assert "Laptop" in categories[0].products
+    assert "Mouse" in categories[0].products
+    assert categories[1].products == ""

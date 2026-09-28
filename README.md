@@ -1,31 +1,16 @@
-  # Bank Operations Widget
+# E-commerce Core
 
-Виджет для обработки банковских операций: фильтрация по статусу и сортировка по дате.
+Ядро для интернет-магазина: классы Product и Category, счётчики, тесты.
 
-## Возможности
+## Реализованный функционал
 
-- `filter_by_state`: фильтрация транзакций по состоянию (по умолчанию `"EXECUTED"`).
-- `sort_by_date`: сортировка транзакций по дате (ISO‑формат), с поддержкой отсутствующих дат.
+- **Product** — класс товара с атрибутами: name, description, price, quantity.
+- **Category** — класс категории с атрибутами: name, description, products (список объектов Product).
+- **Атрибуты класса Category**: category_count и product_count — автоматически увеличиваются при создании новых объектов.
+- **load_categories_from_json()** — загрузка категорий и товаров из JSON-файла.
 
-## Установка
+## Запуск тестов
 
-1. Клонируй репозиторий:
-   ```bash
-   git clone https://github.com/Elena-s-94/bank_operations_widget.git
-   cd bank_operations_widget
-   
-2. Установите зависимости
-   (`pip requirements.txt`)
-
-## Модуль `generators`
-
-Модуль предоставляет генераторы для эффективной обработки транзакций и генерации данных.
-
-### Функции
-
-- `filter_by_currency(transactions, currency)` — возвращает генератор транзакций с заданной валютой.  
-  Пример:
-  ```python
-  usd_transactions = filter_by_currency(transactions, "USD")
-  for _ in range(2):
-      print(next(usd_transactions))
+```bash
+poetry install
+poetry run pytest --cov=main --cov-report=html

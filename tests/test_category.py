@@ -100,3 +100,14 @@ def test_category_str_multiple_quantities():
     c = Category("Test", "Desc", products=[p1, p2, p3])
     result = str(c)
     assert "10" in result
+
+
+def test_load_categories_from_json():
+    from main import load_categories_from_json
+    import os
+
+    json_path = os.path.join(os.path.dirname(__file__), "..", "products.json")
+    if os.path.exists(json_path):
+        categories = load_categories_from_json(json_path)
+        assert len(categories) > 0
+        assert isinstance(categories[0], Category)

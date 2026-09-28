@@ -45,7 +45,7 @@ class Product:
         self.__price = round(new_price, 2)
 
     def __str__(self) -> str:
-        """Строковое представление товара: 'Название, X руб. Остаток: X шт.'"""
+        """Строковое представление товара."""
         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other: "Product") -> float:
@@ -68,10 +68,10 @@ class Category:
     product_count: int = 0
 
     def __init__(
-            self,
-            name: str,
-            description: str,
-            products: list[Product] | None = None,
+        self,
+        name: str,
+        description: str,
+        products: list[Product] | None = None,
     ):
         self.name = name
         self.description = description
@@ -94,10 +94,7 @@ class Category:
         return result
 
     def __str__(self) -> str:
-        """Строковое представление категории: 'Название категории, количество продуктов: X шт.'
-
-        Количество — это сумма quantity всех товаров в категории.
-        """
+        """Строковое представление категории."""
         total_quantity = sum(p.quantity for p in self.__products)
         return f"{self.name}, количество продуктов: {total_quantity} шт."
 

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Смартфоны",
+    "description": "Мобильные телефоны и смартфоны",
+    "products": [
+      {
+        "name": "Samsung Galaxy A55",
+        "description": "Флагман среднего сегмента",
+        "price": 34990.00,
+        "quantity": 15
+      },
+      {
+        "name": "Xiaomi Redmi Note 13",
+        "description": "Бюджетный смартфон с хорошей камерой",
+        "price": 18990.00,
+        "quantity": 30
+      }
+    ]
+  },
+  {
+    "name": "Ноутбуки",
+    "description": "Лэптопы и ультрабуки",
+    "products": [
+      {
+        "name": "MacBook Air M3",
+        "description": "Тонкий и лёгкий ноутбук",
+        "price": 119990.00,
+        "quantity": 5
+      }
+    ]
+  }
+]

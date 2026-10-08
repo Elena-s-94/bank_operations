@@ -54,3 +54,11 @@ line_length = 119
 
 [tool.poetry]
 package-mode = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v"
+
+[tool.coverage.run]
+source = ["src"]

@@ -1,31 +1,22 @@
-  # Bank Operations Widget
+# Курсовая работа: Мониторинг самолётов
 
-Виджет для обработки банковских операций: фильтрация по статусу и сортировка по дате.
+## Описание
+Программа собирает данные о самолётах в воздушном пространстве выбранной страны через
+API nominatim.openstreetmap.org (геокоординаты) и opensky-network.org (информация о самолётах).
 
 ## Возможности
+- Запрос самолётов по названию страны
+- Топ N самолётов по высоте полёта (сортировка DESC)
+- Фильтрация по стране регистрации
+- Фильтрация по диапазону высот
+- Сохранение данных в JSON-файл
 
-- `filter_by_state`: фильтрация транзакций по состоянию (по умолчанию `"EXECUTED"`).
-- `sort_by_date`: сортировка транзакций по дате (ISO‑формат), с поддержкой отсутствующих дат.
+## Запуск
+\```bash
+python main.py
+\```
 
-## Установка
-
-1. Клонируй репозиторий:
-   ```bash
-   git clone https://github.com/Elena-s-94/bank_operations_widget.git
-   cd bank_operations_widget
-   
-2. Установите зависимости
-   (`pip requirements.txt`)
-
-## Модуль `generators`
-
-Модуль предоставляет генераторы для эффективной обработки транзакций и генерации данных.
-
-### Функции
-
-- `filter_by_currency(transactions, currency)` — возвращает генератор транзакций с заданной валютой.  
-  Пример:
-  ```python
-  usd_transactions = filter_by_currency(transactions, "USD")
-  for _ in range(2):
-      print(next(usd_transactions))
+## Тесты
+\```bash
+pytest --cov=src --cov-report=term
+\```
